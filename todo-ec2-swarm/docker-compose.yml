@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+    todo:
+        image: robogeek/todo-app:first-dockerize-redis
+        container_name: todo-app
+        ports: 
+            - "80:80"
+        networks:
+            - dbnet
+        deploy:
+            replicas: 1
+        depends_on:
+            - db
+            - redis
+        dns:
+            - 8.8.8.8
+            - 9.9.9.9
+        environment:
+            - SEQUELIZE_CONNECT=models/sequelize-mysql-docker.yaml
+            - SEQUELIZE_DBHOST=db
+            - SEQUELIZE_DBNAME=tododb
+            - SEQUELIZE_DBUSER=dbuser
+            - SEQUELIZE_DBPASSWD=passw0rd
+            - REDIS_ENDPOINT="redis"
+            # Enable this for debugging output
+            # - DEBUG=todos:*
+ 
+    redis:
+        image: "redis:5.0"
+        container_name: redis
+        # , "--bind", "redis",
+        # command: ["redis-server", "--bind", "0.0.0.0", "--port", "6379", "--protected-mode", "no"]
+        ports:
+            - "6379:6379"
+        deploy:
+            replicas: 1
+        networks:
+            - dbnet
+        dns:
+            - 8.8.8.8
+            - 9.9.9.9
+
+    db:
+        image: mysql/mysql-server:8.0
+        container_name: mysql
+        networks:
+            - dbnet
+        deploy:
+            replicas: 1
+            placement:
+              constraints:
+                - "node.hostname==srv1"
+        command: [ "mysqld",
+                    "--character-set-server=utf8mb4",
+                    "--collation-server=utf8mb4_unicode_ci",
+                    "--bind-address=0.0.0.0" ]
+        volumes:
+            # - /home/ubuntu/dbdata:/var/lib/mysql
+            - type: bind
+              source: /home/ubuntu/dbdata
+              target: /var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=w0rdw0rd
+            - MYSQL_USER=dbuser
+            - MYSQL_PASSWORD=passw0rd
+            - MYSQL_DATABASE=tododb
+
+# Consider adding:
+#    NGINX      for webserver front-end
+#    PHPMyAdmin for database administration
+
+networks:
+    dbnet:
+        driver: overlay
+    

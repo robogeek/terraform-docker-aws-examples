@@ -1,0 +1,7 @@
+out
+node_modules
+terraform-docker-ecs.epub
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
+terraform/state
