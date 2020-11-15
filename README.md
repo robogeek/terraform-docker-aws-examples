@@ -1,6 +1,9 @@
 # terraform-docker-aws-examples
 Examples for using Terraform to deploy to AWS using Docker
 
-Branches:
+This is the EC2-CLUSTER branch, which demonstrates the following:
 
-* [VPC](https://github.com/robogeek/terraform-docker-aws-examples/tree/vpc) - Demonstrates setting up a simple VPC on AWS
+* Setting up an EC2 cluster in Terraform
+* Implementing remote backends to store Terraform state
+* Initializing a Docker Swarm on EC2 instances
+* A complete Docker application stack that can be deployed
