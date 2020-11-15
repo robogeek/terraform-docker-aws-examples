@@ -1,5 +1,5 @@
 provider "aws" {
-  profile = "notes-app"
+  profile = data.terraform_remote_state.vpc.outputs.aws_profile
   region = data.terraform_remote_state.vpc.outputs.aws_region
 }
 
