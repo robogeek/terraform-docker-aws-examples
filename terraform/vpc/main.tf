@@ -3,12 +3,6 @@ provider "aws" {
     region    = var.aws_region
 }
 
-terraform {
-  backend "local" {
-    path = "../state/vpc/terraform.tfstate"
-  }
-}
-
 resource "aws_vpc" "example" {
   cidr_block       = var.vpc_cidr
   enable_dns_support = var.enable_dns_support
