@@ -16,13 +16,6 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
-/* data "terraform_remote_state" "ec2" {
-  backend = "local"
-  config = {
-    path = "../state/ec2/terraform.tfstate"
-  }
-} */
-
 resource "aws_db_parameter_group" "default" {
   name   = "rds-pg"
   family = "mysql8.0"
@@ -71,10 +64,10 @@ resource "aws_db_instance" "tododb" {
   engine               = "mysql"
   engine_version       = "8.0"
   instance_class       = "db.t2.micro"
-  identifier           = var.notesdb_id
-  name                 = var.notesdb_name
-  username             = var.notesdb_username
-  password             = var.notesdb_userpasswd
+  identifier           = var.tododb_id
+  name                 = var.tododb_name
+  username             = var.tododb_username
+  password             = var.tododb_userpasswd
   parameter_group_name = aws_db_parameter_group.default.id
   db_subnet_group_name = aws_db_subnet_group.default.id
   vpc_security_group_ids = [ aws_security_group.rds-sg.id ]
@@ -82,25 +75,3 @@ resource "aws_db_instance" "tododb" {
   skip_final_snapshot  = true
   multi_az             = true
 }
-
-/* 
-resource "aws_db_instance" "usersdb" {
-  allocated_storage    = 20
-  storage_type         = "gp2"
-  engine               = "mysql"
-  engine_version       = "8.0"
-  instance_class       = "db.t2.micro"
-  identifier           = var.usersdb_id
-  name                 = var.usersdb_name
-  username             = var.usersdb_username
-  password             = var.usersdb_userpasswd
-  parameter_group_name = aws_db_parameter_group.default.id
-  db_subnet_group_name = aws_db_subnet_group.default.id
-  vpc_security_group_ids = [ aws_security_group.rds-sg.id ]
-  publicly_accessible  = false
-  skip_final_snapshot  = true
-  multi_az             = true
-}
-*/
-
-
