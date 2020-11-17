@@ -80,6 +80,14 @@ resource "aws_security_group" "ec2-sg" {
     }
 
     ingress {
+        description = "HTTP"
+        protocol    = "TCP"
+        from_port   = 8080
+        to_port     = 8080
+        cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    ingress {
         description = "HTTPS"
         protocol    = "TCP"
         from_port   = 443

@@ -53,6 +53,9 @@ services:
             - "80:80" # <== http
             - "8080:8080" # <== :8080 is where the dashboard runs on
             - "443:443" # <== https
+        dns:
+            - 8.8.8.8
+            - 9.9.9.9
         deploy:
             replicas: 1
             labels:
@@ -99,7 +102,7 @@ services:
         # ports: 
         #    - "80:80"
         networks:
-            - dbnet
+            # - dbnet
             - webnet
             - redisnet
         deploy:
@@ -138,24 +141,26 @@ services:
                 - "traefik.http.middlewares.todo-www-redirect.redirectregex.replacement=https://todo.geekwisdom.net/$${2}"
                 - "traefik.http.middlewares.todo-www-redirect.redirectregex.permanent=true"
         depends_on:
-            - db
+            # - db
             - redis
-        # dns:
-        #    - 8.8.8.8
-        #    - 9.9.9.9
+        dns:
+            - 8.8.8.8
+            - 9.9.9.9
+        secrets:
+            - RDS_DB_CONFIG
         environment:
-            - SEQUELIZE_CONNECT=models/sequelize-mysql-docker.yaml
-            - SEQUELIZE_DBHOST=db
-            - SEQUELIZE_DBNAME=tododb
-            - SEQUELIZE_DBUSER=dbuser
-            - SEQUELIZE_DBPASSWD=passw0rd
+            - SEQUELIZE_CONNECT=/var/run/secrets/RDS_DB_CONFIG
+            # - SEQUELIZE_DBHOST=db
+            # - SEQUELIZE_DBNAME=tododb
+            # - SEQUELIZE_DBUSER=dbuser
+            # - SEQUELIZE_DBPASSWD=passw0rd
             - REDIS_ENDPOINT=redis
             # - REDIS_IOREDIS=yes
             - NODE_DEBUG=redis
             # - REDIS_PASSWD=sider
             # Enable this for debugging output ,socket.io:*
             - DEBUG=todos:*,ioredis:*,socket.io:*,engine
-        command: [ "./wait-for-it.sh", "-t", "0", "db:3306", "--", "node", "./app.mjs" ]
+        # command: [ "./wait-for-it.sh", "-t", "0", "db:3306", "--", "node", "./app.mjs" ]
  
     redis:
         image: redis
@@ -181,38 +186,42 @@ services:
     #    #    - 8.8.8.8
     #    #    - 9.9.9.9
 
-    db:
-        image: mysql/mysql-server:8.0
-        # container_name: mysql
-        networks:
-            - dbnet
-        deploy:
-            replicas: 1
-            placement:
-              constraints:
-                - "node.hostname==srv1"
-        command: [ "mysqld",
-                    "--character-set-server=utf8mb4",
-                    "--collation-server=utf8mb4_unicode_ci",
-                    "--bind-address=0.0.0.0" ]
-        volumes:
-            # - /home/ubuntu/dbdata:/var/lib/mysql
-            - type: bind
-              source: /home/ubuntu/dbdata
-              target: /var/lib/mysql
-        environment:
-            - MYSQL_ROOT_PASSWORD=w0rdw0rd
-            - MYSQL_USER=dbuser
-            - MYSQL_PASSWORD=passw0rd
-            - MYSQL_DATABASE=tododb
+    # db:
+    #    image: mysql/mysql-server:8.0
+    #    # container_name: mysql
+    #    networks:
+    #        - dbnet
+    #    deploy:
+    #        replicas: 1
+    #        placement:
+    #          constraints:
+    #            - "node.hostname==srv1"
+    #    command: [ "mysqld",
+    #                "--character-set-server=utf8mb4",
+    #                "--collation-server=utf8mb4_unicode_ci",
+    #                "--bind-address=0.0.0.0" ]
+    #    volumes:
+    #        # - /home/ubuntu/dbdata:/var/lib/mysql
+    #        - type: bind
+    #          source: /home/ubuntu/dbdata
+    #          target: /var/lib/mysql
+    #    environment:
+    #        - MYSQL_ROOT_PASSWORD=w0rdw0rd
+    #        - MYSQL_USER=dbuser
+    #        - MYSQL_PASSWORD=passw0rd
+    #        - MYSQL_DATABASE=tododb
 
 # Consider adding:
 #    NGINX      for webserver front-end
 #    PHPMyAdmin for database administration
 
+secrets:
+    RDS_DB_CONFIG:
+        external: true
+
 networks:
-    dbnet:
-        driver: overlay
+    # dbnet:
+    #     driver: overlay
     webnet:
         driver: overlay
     redisnet:

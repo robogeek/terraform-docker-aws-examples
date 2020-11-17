@@ -47,6 +47,7 @@ resource "aws_security_group" "rds-sg" {
     protocol    = "tcp"
     from_port   = 0
     to_port     = 3306
+    // cidr_blocks = [ "0.0.0.0/0" ]
     cidr_blocks = [ data.terraform_remote_state.vpc.outputs.vpc_cidr ]
   }
 

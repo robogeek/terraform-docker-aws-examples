@@ -5,3 +5,4 @@ terraform-docker-ecs.epub
 terraform.tfstate
 terraform.tfstate.backup
 terraform/state
+rds-mysql.yaml

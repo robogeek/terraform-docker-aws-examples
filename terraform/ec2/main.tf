@@ -5,7 +5,7 @@ provider "aws" {
 
 terraform {
   backend "local" {
-    path = "../state/db/terraform.tfstate"
+    path = "../state/ec2/terraform.tfstate"
   }
 }
 
