@@ -1,7 +1,7 @@
 resource "aws_instance" "srv1" {
     ami = var.ami_id
     instance_type = var.instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.subnet_public1_id
+    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[0]
     key_name = var.key_pair
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
     associate_public_ip_address = true 
@@ -21,7 +21,7 @@ resource "aws_instance" "srv1" {
 resource "aws_instance" "srv2" {
     ami = var.ami_id
     instance_type = var.instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.subnet_public2_id
+    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[1]
     key_name = var.key_pair
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
     associate_public_ip_address = true 
@@ -40,7 +40,7 @@ resource "aws_instance" "srv2" {
 resource "aws_instance" "srv3" {
     ami = var.ami_id
     instance_type = var.instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.subnet_public2_id
+    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[2]
     key_name = var.key_pair
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
     associate_public_ip_address = true 

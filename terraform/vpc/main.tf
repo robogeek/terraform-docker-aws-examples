@@ -9,60 +9,24 @@ terraform {
   }
 }
 
-resource "aws_vpc" "example" {
-  cidr_block       = var.vpc_cidr
-  enable_dns_support = var.enable_dns_support
-  enable_dns_hostnames = var.enable_dns_hostnames
-
-  tags = {
-    Name = "${var.project_name}-vpc"
-  }
-}
-
-resource "aws_subnet" "public1" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = var.public1_cidr
-  availability_zone = data.aws_availability_zones.available.names[0]
-
-  tags = {
-    Name = "${var.project_name}-net-public1"
-  }
-}
-
-resource "aws_subnet" "public2" {
-  vpc_id     = aws_vpc.example.id
-  cidr_block = var.public2_cidr
-  availability_zone = data.aws_availability_zones.available.names[1]
-
-  tags = {
-    Name = "${var.project_name}-net-public2"
-  }
-}
-
 data "aws_availability_zones" "available" {
-  state = "available"
+    state = "available"
 }
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.example.id
+module "vpc-example" {
+    source = "terraform-aws-modules/vpc/aws"
 
-  tags = {
-    Name =  "${var.project_name}-IGW"
-  }
-}
+    name       = "${var.project_name}-vpc"
+    cidr       = var.vpc_cidr
 
-resource "aws_route" "route-public" {
-  route_table_id         = aws_vpc.example.main_route_table_id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.igw.id
-}
+    enable_nat_gateway     = true
+    single_nat_gateway     = false
+    one_nat_gateway_per_az = false
+    create_igw             = true
+    enable_dns_support     = var.enable_dns_support
+    enable_dns_hostnames   = var.enable_dns_hostnames
 
-resource "aws_route_table_association" "public1" {
-  subnet_id      = aws_subnet.public1.id
-  route_table_id = aws_vpc.example.main_route_table_id
-}
+    azs             = data.aws_availability_zones.available.names
+    public_subnets  = [ var.public1_cidr, var.public2_cidr, var.public3_cidr ]
 
-resource "aws_route_table_association" "public2" {
-  subnet_id      = aws_subnet.public2.id
-  route_table_id = aws_vpc.example.main_route_table_id
 }

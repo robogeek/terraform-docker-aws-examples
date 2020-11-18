@@ -32,10 +32,8 @@ resource "aws_db_parameter_group" "default" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "main"
-  subnet_ids = [
-        data.terraform_remote_state.vpc.outputs.subnet_public1_id,
-        data.terraform_remote_state.vpc.outputs.subnet_public2_id ]
+    name       = "main"
+    subnet_ids = data.terraform_remote_state.vpc.outputs.public_subnets
 }
 
 resource "aws_security_group" "rds-sg" {
