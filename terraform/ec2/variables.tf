@@ -5,5 +5,5 @@ variable "ami_id" {
     default = "ami-09dd2e08d601bff67"
 }
 
-variable "instance_type" { default = "t2.micro" }
-variable "key_pair"      { default = "notes-app-key-pair" }
+variable "instance_type"  { default = "t2.micro" }
+variable "key_pair"       { default = "notes-app-key-pair" }
