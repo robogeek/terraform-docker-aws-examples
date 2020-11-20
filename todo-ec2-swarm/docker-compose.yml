@@ -211,10 +211,6 @@ services:
     #        - MYSQL_PASSWORD=passw0rd
     #        - MYSQL_DATABASE=tododb
 
-# Consider adding:
-#    NGINX      for webserver front-end
-#    PHPMyAdmin for database administration
-
 secrets:
     RDS_DB_CONFIG:
         external: true
