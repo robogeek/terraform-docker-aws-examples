@@ -9,6 +9,8 @@ output "vpc_cidr" { value = module.vpc-example.vpc_cidr_block }
 output "igw_id"   { value = module.vpc-example.igw_id }
 output "igw_arn"  { value = module.vpc-example.igw_arn }
 
-output "public_subnets"  { value = module.vpc-example.public_subnets  }
+output "public_subnets" { value = module.vpc-example.public_subnets }
 
-output "azs" { value       = module.vpc-example.azs }
+output "azs"      { value = module.vpc-example.azs }
+
+output "env_name" { value = var.env_name }
