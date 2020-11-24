@@ -16,6 +16,11 @@ data "terraform_remote_state" "vpc" {
   }
 }
 
+locals {
+    env_name = data.terraform_remote_state.vpc.outputs.env_name
+    config = var.configuration[data.terraform_remote_state.vpc.outputs.env_name]
+}
+
 resource "aws_db_parameter_group" "default" {
   name   = "rds-pg"
   family = "mysql8.0"
@@ -58,19 +63,19 @@ resource "aws_security_group" "rds-sg" {
 }
 
 resource "aws_db_instance" "tododb" {
-  allocated_storage    = 20
-  storage_type         = "gp2"
+  allocated_storage    = local.config.allocated_storage
+  storage_type         = local.config.storage_type
   engine               = "mysql"
   engine_version       = "8.0"
-  instance_class       = "db.t2.micro"
-  identifier           = var.tododb_id
-  name                 = var.tododb_name
-  username             = var.tododb_username
-  password             = var.tododb_userpasswd
+  instance_class       = local.config.instance_class
+  identifier           = local.config.tododb_id
+  name                 = local.config.tododb_name
+  username             = local.config.tododb_username
+  password             = local.config.tododb_userpasswd
   parameter_group_name = aws_db_parameter_group.default.id
   db_subnet_group_name = aws_db_subnet_group.default.id
   vpc_security_group_ids = [ aws_security_group.rds-sg.id ]
   publicly_accessible  = false
-  skip_final_snapshot  = true
-  multi_az             = true
+  skip_final_snapshot  = local.config.skip_final_snapshot
+  multi_az             = local.config.multi_az
 }
