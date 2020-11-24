@@ -15,3 +15,9 @@ data "terraform_remote_state" "vpc" {
     path = "../state/vpc/terraform.tfstate"
   }
 }
+
+locals {
+    env_name = data.terraform_remote_state.vpc.outputs.env_name
+    config = var.configuration[local.env_name]
+}
+

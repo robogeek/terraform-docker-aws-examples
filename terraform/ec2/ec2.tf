@@ -1,59 +1,26 @@
-resource "aws_instance" "srv1" {
-    ami = var.ami_id
-    instance_type = var.instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[0]
-    key_name = var.key_pair
-    vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
-    associate_public_ip_address = true 
-    tags = {
-        Name = "ec2-srv1"
-    }
-    // depends_on = [ 
-    //     data.terraform_remote_state.vpc.outputs.vpc_id,
-    //     data.terraform_remote_state.vpc.outputs.igw_id, ]
-    user_data = join("\n", [
-        file("docker_install.sh"),
-        "sudo hostname srv1",
-        "docker swarm init"
-    ])
-}
+resource "aws_instance" "srv" {
+    count = length(local.config)
 
-resource "aws_instance" "srv2" {
     ami = var.ami_id
-    instance_type = var.instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[1]
+    instance_type = local.config[count.index].instance_type
+    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[
+        count.index % length(data.terraform_remote_state.vpc.outputs.public_subnets)
+    ]
     key_name = var.key_pair
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
-    associate_public_ip_address = true 
-    tags = {
-        Name = "ec2-srv2"
-    }
-    // depends_on = [ 
-    //     data.terraform_remote_state.vpc.outputs.vpc_id,
-    //     data.terraform_remote_state.vpc.outputs.igw_id ]
-    user_data = join("\n", [
-        file("docker_install.sh"),
-        "sudo hostname srv2"
-    ])
-}
+    associate_public_ip_address = local.config[count.index].associate_public_ip_address
 
-resource "aws_instance" "srv3" {
-    ami = var.ami_id
-    instance_type = var.instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[2]
-    key_name = var.key_pair
-    vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
-    associate_public_ip_address = true 
     tags = {
-        Name = "ec2-srv3"
+        Name = local.config[count.index].name
     }
-    // depends_on = [ 
-    //     data.terraform_remote_state.vpc.outputs.vpc_id,
-    //     data.terraform_remote_state.vpc.outputs.igw_id ]
+
     user_data = join("\n", [
         file("docker_install.sh"),
-        "sudo hostname srv3"
+        "sudo hostname ${local.config[count.index].host_name}",
+        local.config[count.index].swarm_init
+            ? "docker swarm init" : ""
     ])
+
 }
 
 resource "aws_security_group" "ec2-sg" {
