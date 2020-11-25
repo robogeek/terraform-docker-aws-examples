@@ -24,13 +24,12 @@ data "terraform_remote_state" "db" {
   }
 }
 
-
 resource "local_file" "swarm-config" {
     filename = "${path.module}/swarm-config.sh"
     content = templatefile("./tmpl/swarm-config-tmpl.sh", {
-        srv1: var.srv1_ssh_id,
-        srv2: var.srv2_ssh_id,
-        srv3: var.srv3_ssh_id,
+        servers: slice(data.terraform_remote_state.ec2.outputs.srv-ssh, 
+                    1, length(data.terraform_remote_state.ec2.outputs.srv-ssh)),
+        srv1: data.terraform_remote_state.ec2.outputs.srv-ssh[0],
         context: var.docker_context
     })
 }
@@ -38,9 +37,7 @@ resource "local_file" "swarm-config" {
 resource "local_file" "swarm-check" {
     filename = "${path.module}/swarm-check.sh"
     content = templatefile("./tmpl/swarm-check-tmpl.sh", {
-        srv1: var.srv1_ssh_id,
-        srv2: var.srv2_ssh_id,
-        srv3: var.srv3_ssh_id
+        servers: data.terraform_remote_state.ec2.outputs.srv-ssh
     })
 }
 
