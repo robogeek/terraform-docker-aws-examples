@@ -1,12 +1,9 @@
 # terraform-docker-aws-examples
 Examples for using Terraform to deploy to AWS using Docker
 
-This is the EC2-RDS branch, which builds on the [EC2-CLUSTER](https://github.com/robogeek/terraform-docker-aws-examples/tree/ec2-cluster) branch.  That branch demonstrated setting up an EC2 cluster, initializing Docker Swarm, and deploying a Docker application stack.
+This is the TERRAFORM-ECS branch, which builds on the TODO TODO TODO branch.  That branch demonstrated setting up TODO TODO TODO
 
-In the EC2-CLUSTER branch, the Docker stack included a MySQL instance to provide the database.
+In the TODO branch, the Docker stack included a TODO
 
-In the EC2-RDS branch, we instead use the AWS RDS service to provide the database.  This requires the following:
-
-* Implement Terraform code to declare the RDS instance
-* Modifications to the Docker Stack to utilize that instance
+In the TERRAFORM-ECS branch, we demonstrated deploying Docker containers to ECS
 
