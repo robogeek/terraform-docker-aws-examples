@@ -17,6 +17,7 @@ variable "configuration" {
     type = map(object({
         vpc_cidr=string,
         public_subnet_cidrs=list(string),
+        private_subnet_cidrs=list(string),
         enable_nat_gateway=bool,
         single_nat_gateway=bool,
         one_nat_gateway_per_az=bool,
@@ -28,6 +29,7 @@ variable "configuration" {
         "DEV" = {
             vpc_cidr = "10.0.0.0/16",
             public_subnet_cidrs = [ "10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24" ],
+            private_subnet_cidrs = [ "10.0.20.0/24", "10.0.21.0/24", "10.0.22.0/24" ],
             enable_nat_gateway = true,
             single_nat_gateway = false,
             one_nat_gateway_per_az = false,
@@ -38,6 +40,7 @@ variable "configuration" {
         "QA" = {
             vpc_cidr = "10.1.0.0/16",
             public_subnet_cidrs = [ "10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24" ],
+            private_subnet_cidrs = [ "10.1.20.0/24", "10.1.21.0/24", "10.1.22.0/24" ],
             enable_nat_gateway = true,
             single_nat_gateway = false,
             one_nat_gateway_per_az = false,
@@ -48,6 +51,7 @@ variable "configuration" {
         "STAGE" = {
             vpc_cidr = "10.2.0.0/16",
             public_subnet_cidrs = [ "10.2.1.0/24", "10.2.2.0/24", "10.2.3.0/24" ],
+            private_subnet_cidrs = [ "10.2.20.0/24", "10.2.21.0/24", "10.2.22.0/24" ],
             enable_nat_gateway = true,
             single_nat_gateway = false,
             one_nat_gateway_per_az = false,
@@ -58,6 +62,7 @@ variable "configuration" {
         "PROD" = {
             vpc_cidr = "10.3.0.0/16",
             public_subnet_cidrs = [ "10.3.1.0/24", "10.3.2.0/24", "10.3.3.0/24" ],
+            private_subnet_cidrs = [ "10.3.20.0/24", "10.3.21.0/24", "10.3.22.0/24" ],
             enable_nat_gateway = true,
             single_nat_gateway = false,
             one_nat_gateway_per_az = false,
