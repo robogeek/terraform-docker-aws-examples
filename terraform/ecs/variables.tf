@@ -17,3 +17,15 @@ variable "ecs_task_execution_role_name" {
     description = "ECS task execution role name"
     default = "myEcsTaskExecutionRole"
 }
+
+variable "configuration" {
+    type = map(object({
+        domain_root=string
+    }))
+    default = {
+        "DEV" = {
+            domain_root = "reikiworld.biz"
+        }
+        // ...
+    }
+}

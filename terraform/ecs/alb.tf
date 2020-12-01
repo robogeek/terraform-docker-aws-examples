@@ -1,36 +1,36 @@
 
 module "alb" {
-  source  = "terraform-aws-modules/alb/aws"
-  version = "~> 5.0"
+    source  = "terraform-aws-modules/alb/aws"
+    version = "~> 5.0"
 
-  name = "${data.terraform_remote_state.vpc.outputs.project_name}-load-balancer"
+    name = "${data.terraform_remote_state.vpc.outputs.project_name}-load-balancer"
 
-  load_balancer_type = "application"
+    load_balancer_type = "application"
 
-  vpc_id             = data.terraform_remote_state.vpc.outputs.vpc_id
-  subnets            = data.terraform_remote_state.vpc.outputs.public_subnets
-  security_groups    = [ aws_security_group.lb.id ]
+    vpc_id             = data.terraform_remote_state.vpc.outputs.vpc_id
+    subnets            = data.terraform_remote_state.vpc.outputs.public_subnets
+    security_groups    = [ aws_security_group.lb.id ]
 
- target_groups = [
-    {
-      name_prefix      = "pref-"
-      backend_protocol = "HTTP"
-      backend_port     = 80
-      target_type      = "ip"
+    target_groups = [
+        {
+            name_prefix      = "pref-"
+            backend_protocol = "HTTP"
+            backend_port     = 80
+            target_type      = "ip"
+        }
+    ]
+
+    http_tcp_listeners = [
+        {
+            port               = 80
+            protocol           = "HTTP"
+            target_group_index = 0
+        }
+    ]
+
+    tags = {
+        Environment = "Test"
     }
-  ]
-
-   http_tcp_listeners = [
-    {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
-    }
-  ]
-
-  tags = {
-    Environment = "Test"
-  }
 }
 
 

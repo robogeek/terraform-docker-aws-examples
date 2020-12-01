@@ -27,3 +27,8 @@ resource "aws_ecs_cluster" "main" {
     name = "${data.terraform_remote_state.vpc.outputs.project_name}-ecs-cluster"
     capacity_providers = [ "FARGATE" ]
 }
+
+locals {
+    env_name = data.terraform_remote_state.vpc.outputs.env_name
+    config = var.configuration[data.terraform_remote_state.vpc.outputs.env_name]
+}
