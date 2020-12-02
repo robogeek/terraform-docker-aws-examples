@@ -25,6 +25,10 @@ module "alb" {
         backend_protocol = "HTTP"
         backend_port     = 80
         target_type      = "ip"
+        stickiness = {
+            enabled = true
+            type = "lb_cookie"
+        }
     } ]
 
     # For any HTTP inbound traffic, redirect to HTTPS

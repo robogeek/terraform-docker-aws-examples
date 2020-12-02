@@ -33,10 +33,11 @@ resource "aws_ecs_task_definition" "todo" {
                 containerPort = 80
                 hostPort = 80
             } ]
-            environment = [ /* {
+            environment = [ {
                     name = "REDIS_ENDPOINT"
-                    value = "redis"
-                }, */ {
+                    // name = aws_elasticache_cluster.example.cache_nodes[0].address
+                    value = "redis.todo"
+                }, {
                     name = "SEQUELIZE_CONNECT"
                     value = "models/sequelize-mysql-docker.yaml"
                 }, {
@@ -108,7 +109,7 @@ resource "aws_ecs_service" "todo" {
 
 resource "aws_security_group" "todo_task" {
     name        = "${data.terraform_remote_state.vpc.outputs.project_name}-todo-task-security-group"
-    vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id 
+    vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id
 
     ingress {
         protocol        = "tcp"

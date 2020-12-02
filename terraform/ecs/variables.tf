@@ -6,7 +6,7 @@ variable "todo_image" {
 
 variable "todo_fargate_cpu"    { default = 256 }
 variable "todo_fargate_memory" { default = 512 }
-variable "todo_count"          { default = 1 }
+variable "todo_count"          { default = 5 }
 
 variable "redis_fargate_cpu"    { default = 256 }
 variable "redis_fargate_memory" { default = 512 }
@@ -20,11 +20,13 @@ variable "ecs_task_execution_role_name" {
 
 variable "configuration" {
     type = map(object({
-        domain_root=string
+        domain_root=string,
+        service_discovery_namespace=string
     }))
     default = {
         "DEV" = {
-            domain_root = "reikiworld.biz"
+            domain_root = "reikiworld.biz",
+            service_discovery_namespace="todo"
         }
         // ...
     }
