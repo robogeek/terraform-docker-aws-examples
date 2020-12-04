@@ -5,6 +5,8 @@ module "acm" {
 
     domain_name = local.bare_domain
     zone_id     = data.aws_route53_zone.rootzone.zone_id
+    
+    subject_alternative_names = [ local.www_domain ]
 }
 
 module "alb" {
