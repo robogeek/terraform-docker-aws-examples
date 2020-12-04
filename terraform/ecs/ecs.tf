@@ -36,7 +36,7 @@ resource "aws_ecs_task_definition" "todo" {
             environment = [ {
                     name = "REDIS_ENDPOINT"
                     // name = aws_elasticache_cluster.example.cache_nodes[0].address
-                    value = "redis.todo"
+                    value = local.redis_fqdn
                 }, {
                     name = "SEQUELIZE_CONNECT"
                     value = "models/sequelize-mysql-docker.yaml"

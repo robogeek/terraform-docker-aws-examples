@@ -26,7 +26,7 @@ variable "configuration" {
     default = {
         "DEV" = {
             domain_root = "reikiworld.biz",
-            service_discovery_namespace="todo"
+            service_discovery_namespace="dev.todo"
         }
         // ...
     }

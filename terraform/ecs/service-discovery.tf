@@ -24,3 +24,8 @@ resource "aws_service_discovery_service" "redis-service" {
     }
 }
 
+locals {
+    redis_zone = aws_service_discovery_private_dns_namespace.example.name
+    redis_host = aws_service_discovery_service.redis-service.name
+    redis_fqdn = "${local.redis_host}.${local.redis_zone}"
+}
