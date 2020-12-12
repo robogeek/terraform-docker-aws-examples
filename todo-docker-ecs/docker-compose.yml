@@ -1,5 +1,9 @@
 version: '3.8'
 
+# x-aws-cluster: ${ECS_CLUSTER_ARN}
+# x-aws-vpc: ${VPC_ARN}
+# x-aws-loadbalancer: ${ALB_ARN}
+
 services:
 
     # cronginx:
@@ -45,116 +49,116 @@ services:
     #        - /home/ubuntu/proxyman/data:/data
     #        - /home/ubuntu/proxyman/letsencrypt:/etc/letsencrypt
 
-    traefik:
-        image: traefik:v2.0
-        restart: always
-        # container_name: traefik
-        ports:
-            - "80:80" # <== http
-            - "8080:8080" # <== :8080 is where the dashboard runs on
-            - "443:443" # <== https
-        dns:
-            - 8.8.8.8
-            - 9.9.9.9
-        deploy:
-            replicas: 1
-            labels:
-                #### Labels define the behavior and rules of the traefik proxy for this container ####
-                - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
-                - "traefik.http.routers.api.rule=Host(`mgr.geekwisdom.net`)" # <== Setting the domain for the dashboard
-                - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
-                - "traefik.http.routers.api.entrypoints=web"
-            placement:
-                constraints:
-                    - "node.hostname==srv1"
-        command:
-            - "--log.level=DEBUG"
-            - "--api.insecure=true" # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
-            - "--api.dashboard=true" # <== Enabling the dashboard to view services, middlewares, routers, etc...
-            # - --api.debug=false # <== Enabling additional endpoints for debugging and profiling
-            - "--accesslog=true"
-            - "--tracing=true"
-            - "--entrypoints.web.address=:80" # <== Defining an entrypoint for port :80 named web
+    # traefik:
+    #    image: traefik:v2.0
+    #    restart: always
+    #    # container_name: traefik
+    #    ports:
+    #        - "80:80" # <== http
+    #        - "8080:8080" # <== :8080 is where the dashboard runs on
+    #        - "443:443" # <== https
+        # dns:
+        #     - 8.8.8.8
+        #     - 9.9.9.9
+    #    deploy:
+    #        replicas: 1
+    #        labels:
+    #            #### Labels define the behavior and rules of the traefik proxy for this container ####
+    #            - "traefik.enable=true" # <== Enable traefik on itself to view dashboard and assign subdomain to view it
+    #            - "traefik.http.routers.api.rule=Host(`mgr.geekwisdom.net`)" # <== Setting the domain for the dashboard
+    #            - "traefik.http.routers.api.service=api@internal" # <== Enabling the api to be a service to access
+    #            - "traefik.http.routers.api.entrypoints=web"
+    #        placement:
+    #            constraints:
+    #                - "node.hostname==srv1"
+    #    command:
+    #        - "--log.level=DEBUG"
+    #        - "--api.insecure=true" # <== Enabling insecure api, NOT RECOMMENDED FOR PRODUCTION
+    #        - "--api.dashboard=true" # <== Enabling the dashboard to view services, middlewares, routers, etc...
+    #        # - --api.debug=false # <== Enabling additional endpoints for debugging and profiling
+    ##        - "--accesslog=true"
+    #        - "--tracing=true"
+    #        - "--entrypoints.web.address=:80" # <== Defining an entrypoint for port :80 named web
             # - "--entrypoints.web.http.redirections.entrypoint.to=web-secured"
             # - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-            - "--entrypoints.web-secured.address=:443" # <== Defining an entrypoint for https on port :443 named web-secured
-            - "--providers.docker=true" # <== Enabling docker as the provider for traefik
-            - "--providers.docker.exposedbydefault=false" # <== Don't expose every container to traefik, only expose enabled ones
-            - "--providers.docker.swarmmode=true"
-            - "--providers.docker.endpoint=unix:///var/run/docker.sock"
-            - "--providers.docker.watch=true"
+    #        - "--entrypoints.web-secured.address=:443" # <== Defining an entrypoint for https on port :443 named web-secured
+    #        - "--providers.docker=true" # <== Enabling docker as the provider for traefik
+    #        - "--providers.docker.exposedbydefault=false" # <== Don't expose every container to traefik, only expose enabled ones
+    #        - "--providers.docker.swarmmode=true"
+    #        - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+    #        - "--providers.docker.watch=true"
     #        # - --providers.file.filename=/dynamic.yaml # <== Referring to a dynamic configuration file
-            - "--providers.docker.network=todo_webnet" # <== Operate on the docker network named web
-            - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=false" # <== Enable TLS-ALPN-01 to generate and renew ACME certs
-            - "--certificatesresolvers.mytlschallenge.acme.email=david@davidherron.com" # <== Setting email for certs
-            - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json" # <== Defining acme file to store cert 
-            - "--certificatesresolvers.mytlschallenge.acme.httpChallenge.entryPoint=web"
-        volumes:
-            - /home/ubuntu/letsencrypt:/letsencrypt # <== Volume for certs (TLS)
-            - /var/run/docker.sock:/var/run/docker.sock # <== Volume for docker admin
+    #        - "--providers.docker.network=todo_webnet" # <== Operate on the docker network named web
+    #        - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=false" # <== Enable TLS-ALPN-01 to generate and renew ACME certs
+    #        - "--certificatesresolvers.mytlschallenge.acme.email=david@davidherron.com" # <== Setting email for certs
+    #        - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json" # <== Defining acme file to store cert 
+    #        - "--certificatesresolvers.mytlschallenge.acme.httpChallenge.entryPoint=web"
+    #    volumes:
+    #        - /home/ubuntu/letsencrypt:/letsencrypt # <== Volume for certs (TLS)
+    #        - /var/run/docker.sock:/var/run/docker.sock # <== Volume for docker admin
     #        # - /home/ubuntu/dynamic.yaml:/dynamic.yaml # <== Volume for dynamic conf file, **ref: line 27
-        networks:
-            - webnet
+    #    networks:
+    #        - webnet
 
     todo:
         image: robogeek/todo-app:first-dockerize-redis
         # container_name: todo-app
-        # ports: 
-        #    - "80:80"
-        networks:
-            # - dbnet
-            - webnet
-            - redisnet
+        ports: 
+           - "80:80"
+    #    networks:
+    #        # - dbnet
+    #        - webnet
+    #        - redisnet
         deploy:
-            replicas: 3
-            labels:
-                #### Labels define the behavior and rules of the traefik proxy for this container ####
-                - "traefik.enable=true"
-                - "traefik.http.routers.todo.rule=Host(`todo.geekwisdom.net`)"
-                - "traefik.http.routers.todo.entrypoints=web"
-                - "traefik.http.routers.todo.middlewares=todo-https-redirect"
-                #
-                - "traefik.http.routers.todo-www.rule=Host(`www.todo.geekwisdom.net`)"
-                - "traefik.http.routers.todo-www.entrypoints=web"
-                - "traefik.http.routers.todo-www.middlewares=todo-www-redirect"
-                #
-                - "traefik.http.services.todo.loadbalancer.healthcheck.port=80"
-                - "traefik.http.services.todo.loadbalancer.sticky=true"
-                - "traefik.http.services.todo.loadbalancer.sticky.cookie.name=StickySessionCookie"
-                - "traefik.http.services.todo.loadbalancer.server.port=80"
-                #
-                - "traefik.http.routers.todo-secured.rule=Host(`todo.geekwisdom.net`)"
-                - "traefik.http.routers.todo-secured.entrypoints=web-secured"
-                - "traefik.http.routers.todo-secured.service=todo"
-                - "traefik.http.routers.todo-secured.tls=true"
-                - "traefik.http.routers.todo-secured.tls.certresolver=mytlschallenge"
-                #
-                - "traefik.http.routers.todo-www-secured.rule=Host(`www.todo.geekwisdom.net`)"
-                - "traefik.http.routers.todo-www-secured.entrypoints=web-secured"
-                - "traefik.http.routers.todo-www-secured.middlewares=todo-www-redirect"
-                - "traefik.http.routers.todo-www-secured.tls=true"
-                - "traefik.http.routers.todo-www-secured.tls.certresolver=mytlschallenge"
-                #
-                - "traefik.http.middlewares.todo-https-redirect.redirectscheme.scheme=https"
-                - "traefik.http.middlewares.todo-https-redirect.redirectscheme.permanent=true"
-                - "traefik.http.middlewares.todo-www-redirect.redirectregex.regex=^(https|http)://www.todo.geekwisdom.net/(.*)"
-                - "traefik.http.middlewares.todo-www-redirect.redirectregex.replacement=https://todo.geekwisdom.net/$${2}"
-                - "traefik.http.middlewares.todo-www-redirect.redirectregex.permanent=true"
+            replicas: 1
+    #        labels:
+    #            #### Labels define the behavior and rules of the traefik proxy for this container ####
+    #            - "traefik.enable=true"
+    #            - "traefik.http.routers.todo.rule=Host(`todo.geekwisdom.net`)"
+    #            - "traefik.http.routers.todo.entrypoints=web"
+    #            - "traefik.http.routers.todo.middlewares=todo-https-redirect"
+    #            #
+    #            - "traefik.http.routers.todo-www.rule=Host(`www.todo.geekwisdom.net`)"
+    #            - "traefik.http.routers.todo-www.entrypoints=web"
+    #            - "traefik.http.routers.todo-www.middlewares=todo-www-redirect"
+    #            #
+    #            - "traefik.http.services.todo.loadbalancer.healthcheck.port=80"
+    #            - "traefik.http.services.todo.loadbalancer.sticky=true"
+    #            - "traefik.http.services.todo.loadbalancer.sticky.cookie.name=StickySessionCookie"
+    #            - "traefik.http.services.todo.loadbalancer.server.port=80"
+    #            #
+    #            - "traefik.http.routers.todo-secured.rule=Host(`todo.geekwisdom.net`)"
+    #            - "traefik.http.routers.todo-secured.entrypoints=web-secured"
+    #            - "traefik.http.routers.todo-secured.service=todo"
+    #            - "traefik.http.routers.todo-secured.tls=true"
+    #            - "traefik.http.routers.todo-secured.tls.certresolver=mytlschallenge"
+    #            #
+    #            - "traefik.http.routers.todo-www-secured.rule=Host(`www.todo.geekwisdom.net`)"
+    #            - "traefik.http.routers.todo-www-secured.entrypoints=web-secured"
+    #            - "traefik.http.routers.todo-www-secured.middlewares=todo-www-redirect"
+    #            - "traefik.http.routers.todo-www-secured.tls=true"
+    #            - "traefik.http.routers.todo-www-secured.tls.certresolver=mytlschallenge"
+    #            #
+    #            - "traefik.http.middlewares.todo-https-redirect.redirectscheme.scheme=https"
+    ##            - "traefik.http.middlewares.todo-https-redirect.redirectscheme.permanent=true"
+    #            - "traefik.http.middlewares.todo-www-redirect.redirectregex.regex=^(https|http)://www.todo.geekwisdom.net/(.*)"
+    #            - "traefik.http.middlewares.todo-www-redirect.redirectregex.replacement=https://todo.geekwisdom.net/$${2}"
+    #            - "traefik.http.middlewares.todo-www-redirect.redirectregex.permanent=true"
         depends_on:
             # - db
             - redis
-        dns:
-            - 8.8.8.8
-            - 9.9.9.9
-        secrets:
-            - RDS_DB_CONFIG
+    #    dns:
+    #        - 8.8.8.8
+    #        - 9.9.9.9
+    #    secrets:
+    #        - RDS_DB_CONFIG
         environment:
-            - SEQUELIZE_CONNECT=/var/run/secrets/RDS_DB_CONFIG
-            # - SEQUELIZE_DBHOST=db
-            # - SEQUELIZE_DBNAME=tododb
-            # - SEQUELIZE_DBUSER=dbuser
-            # - SEQUELIZE_DBPASSWD=passw0rd
-            - REDIS_ENDPOINT=redis
+    #        - SEQUELIZE_CONNECT=/var/run/secrets/RDS_DB_CONFIG
+            - SEQUELIZE_DBHOST=${SEQUELIZE_DBHOST}
+            - SEQUELIZE_DBNAME=${SEQUELIZE_DBNAME}
+            - SEQUELIZE_DBUSER=${SEQUELIZE_DBUSER}
+            - SEQUELIZE_DBPASSWD=${SEQUELIZE_DBPASSWD}
+            # - REDIS_ENDPOINT=redis.todo.local
             # - REDIS_IOREDIS=yes
             - NODE_DEBUG=redis
             # - REDIS_PASSWD=sider
@@ -165,7 +169,7 @@ services:
     redis:
         image: redis
     #    # container_name: redis
-        hostname: redis
+    #    hostname: redis
     #    # , "--bind", "redis",
     #    # command: ["redis-server", 
     #    #                "--bind", "0.0.0.0", 
@@ -177,11 +181,11 @@ services:
     #    #     - "6379:6379"
         deploy:
             replicas: 1
-            placement:
-                constraints:
-                    - "node.hostname==srv2"
-        networks:
-            - redisnet
+    #        placement:
+    #            constraints:
+    #                - "node.hostname==srv2"
+    #    networks:
+    #        - redisnet
     #    # dns:
     #    #    - 8.8.8.8
     #    #    - 9.9.9.9
@@ -211,15 +215,15 @@ services:
     #        - MYSQL_PASSWORD=passw0rd
     #        - MYSQL_DATABASE=tododb
 
-secrets:
-    RDS_DB_CONFIG:
-        external: true
+#secrets:
+#    RDS_DB_CONFIG:
+#        external: true
 
-networks:
-    # dbnet:
-    #     driver: overlay
-    webnet:
-        driver: overlay
-    redisnet:
-        driver: overlay
+# networks:
+#    # dbnet:
+#    #     driver: overlay
+#    webnet:
+#        driver: overlay
+#    redisnet:
+#        driver: overlay
 
