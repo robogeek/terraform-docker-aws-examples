@@ -1,4 +1,8 @@
 
+variable "ecs-project-name" {
+    default = "todo"
+}
+
 variable "configuration" {
     type = map(object({
         domain_root=string,
