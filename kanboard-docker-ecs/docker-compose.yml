@@ -1,0 +1,16 @@
+version: '3.8'
+
+# x-aws-cluster: "kanban-ecs-cluster" # ${ECS_CLUSTER_NAME}
+# x-aws-vpc: "vpc-0a163ae0083ee9a8d"  # ${VPC_ID}
+# x-aws-loadbalancer: "kanban-load-balancer" # ${ALB_NAME}
+
+services:
+  kanboard:
+    image: kanboard/kanboard:latest
+    container_name: kanboard
+    environment:
+      - DEBUG=true
+    ports:
+      - "80:80"
+      # - "443:443"
+
