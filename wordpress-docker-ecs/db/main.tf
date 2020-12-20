@@ -12,3 +12,4 @@ data "aws_vpcs" "default-vpc" {
 locals {
   default-vpc-id = tolist(data.aws_vpcs.default-vpc.ids)[0]
 }
+
