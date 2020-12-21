@@ -6,6 +6,8 @@ resource "local_file" "deploy" {
         db_user: var.db_username,
         db_password: var.db_passwd,
         db_name: var.db_name,
-        wp_id: aws_efs_file_system.wordpress.id
+        wp_id: aws_efs_file_system.wordpress.id,
+        alb_arn: module.alb.this_lb_arn,
+        alb_name: local.alb_name
     })
 }
