@@ -1,4 +1,9 @@
 version: '3.8'
+
+# x-aws-cluster: ${ECS_CLUSTER_NAME}
+# x-aws-vpc: ${VPC_ID}
+x-aws-loadbalancer: ${ALB_ARN}
+
 services:
   wordpress:
     image: wordpress:latest
@@ -6,6 +11,7 @@ services:
     #   replicas: 5
     ports:
       - 80:80
+      # - 443:443
     # restart: always
     environment:
       WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
