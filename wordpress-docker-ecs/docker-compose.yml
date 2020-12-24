@@ -13,20 +13,20 @@ services:
       - 80:80
       # - 443:443
     # restart: always
-    # secrets:
-    #  - db_access
+    secrets:
+      - db_access
     environment:
       # Use these if not using the Secrets Manager
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      # WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      # WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      # WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      # WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
 
       # Use these if using the Secrets Manager
-      # WORDPRESS_DB_HOST_FILE: /run/secrets/db_access/db_host
-      # WORDPRESS_DB_USER_FILE: /run/secrets/db_access/db_user
-      # WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_access/db_password
-      # WORDPRESS_DB_NAME_FILE: /run/secrets/db_access/db_name
+      WORDPRESS_DB_HOST_FILE: /run/secrets/db_access/db_host
+      WORDPRESS_DB_USER_FILE: /run/secrets/db_access/db_user
+      WORDPRESS_DB_PASSWORD_FILE: /run/secrets/db_access/db_password
+      WORDPRESS_DB_NAME_FILE: /run/secrets/db_access/db_name
     volumes:
       - wpfs:/var/www/html
 
@@ -35,25 +35,13 @@ volumes:
     external: true
     name: ${WP_EFS_ID}
 
-# secrets:
-#  db_access:
-#    external: true
-#    name: ${DB_ACCESS_ARN}
-#    x-aws-keys:
-#      - db_host
-#      - db_user
-#      - db_password
-#      - db_name
+secrets:
+  db_access:
+    external: true
+    name: ${DB_ACCESS_ARN}
+    x-aws-keys:
+      - db_host
+      - db_user
+      - db_password
+      - db_name
 
-#  db_host:
-#    external: true
-#    name: ${DB_HOST_ARN}
-#  db_user:
-#    external: true
-#    name: ${DB_USER_ARN}
-#  db_password:
-#    external: true
-#    name: ${DB_PASSWORD_ARN}
-#  db_name:
-#    external: true
-#    name: ${DB_NAME_ARN}
