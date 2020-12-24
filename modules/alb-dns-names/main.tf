@@ -6,6 +6,7 @@ variable "vpc_id"        { }
 variable "vpc_subnets"   { }
 variable "rootzone_name" { }
 variable "domain_names"  { }
+variable "cidrs"         { default = [ "0.0.0.0/0" ] }
 
 ///////////- MAIN CODE
 
@@ -31,13 +32,13 @@ resource "aws_security_group" "lb" {
         protocol    = "tcp"
         from_port   = 0
         to_port     = "80"
-        cidr_blocks = [ "0.0.0.0/0" ]
+        cidr_blocks = var.cidrs
     }
     ingress {
         protocol    = "tcp"
         from_port   = 0
         to_port     = "443"
-        cidr_blocks = [ "0.0.0.0/0" ]
+        cidr_blocks = var.cidrs
     }
     egress {
         protocol    = "-1"
