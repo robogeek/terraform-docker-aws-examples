@@ -37,8 +37,11 @@ resource "aws_security_group" "rds-sg" {
     protocol    = "tcp"
     from_port   = 0
     to_port     = 3306
-    cidr_blocks = [ "0.0.0.0/0" ]
-    // cidr_blocks = module.default-vpc.default_vpc_cidrs
+    // Use this for permissive access by anyone
+    // cidr_blocks = [ "0.0.0.0/0" ]
+
+    // Use this to restrict access to the VPC network
+    cidr_blocks = module.default-vpc.default_vpc_cidrs
   }
 
   egress {
