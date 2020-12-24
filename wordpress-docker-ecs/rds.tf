@@ -31,14 +31,14 @@ resource "aws_db_parameter_group" "default" {
 resource "aws_security_group" "rds-sg" {
   name        = "rds-security-group"
   description = "allow inbound access to the database"
-  vpc_id      = local.default-vpc-id
+  vpc_id      = module.default-vpc.default_vpc_id
 
   ingress {
     protocol    = "tcp"
     from_port   = 0
     to_port     = 3306
-    // cidr_blocks = [ "0.0.0.0/0" ]
-    cidr_blocks = local.default-vpc-cidrs
+    cidr_blocks = [ "0.0.0.0/0" ]
+    // cidr_blocks = module.default-vpc.default_vpc_cidrs
   }
 
   egress {
