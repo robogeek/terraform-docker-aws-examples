@@ -1,0 +1,38 @@
+# docker run --name sshd -p 2222:22 -d -t -e USER_ID=1000 -e GROUP_ID=1000 -v /part/to/project:/home/project/ ledokun/sshd
+
+version: "3.8"
+services:
+    sshd:
+        image: ledokun/sshd
+        container_name: sshd
+        ports:
+            - 22:22
+        environment:
+            - USER_ID=1000
+            - GROUP_ID=1000
+        volumes:
+            - wpfs:/var/www/html
+            - projecthome:/home/project
+
+# Need to mount a volume to /home/project so that the .ssh directory persists
+# BUT the problem with this container is that rsync does not work
+
+# SIMPLER: Create a simple Terraform that creates an EC2 instance that has the EFS partition
+
+# EVEN SIMPLER: In the EFS documentation it says to create a mount target with a custom security group allowing access from your premesis network
+# And then you use an NFS client to remotely mount the file system
+# https://docs.aws.amazon.com/efs/latest/ug/efs-onpremises.html
+#
+# Hence - simple Terraform to 
+#    a) find the EFS partition
+#    b) set up mount target w/ custom security group
+#    c) print out data required for NFS mount
+#    d) on laptop run the mount command
+
+
+
+volumes:
+  projecthome:
+  wpfs:
+    external: true
+    name: ${WP_EFS_ID}
