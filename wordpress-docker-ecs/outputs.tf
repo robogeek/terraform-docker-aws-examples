@@ -10,3 +10,5 @@ output "default_vpc_cidrs" { value = module.default-vpc.default_vpc_cidrs }
 
 output "wp_id"       { value = aws_efs_file_system.wordpress.id }
 output "wp_arn"      { value = aws_efs_file_system.wordpress.arn }
+
+output "efs_id"      { value = aws_efs_file_system.wordpress.id }
