@@ -1,18 +1,13 @@
 
-variable "ecs-project-name" {
-    default = "todo"
-}
+variable "aws_profile"  {  }
+variable "aws_region"   {  }
 
-variable "configuration" {
-    type = map(object({
-        domain_root=string,
-        service_discovery_namespace=string
-    }))
-    default = {
-        "DEV" = {
-            domain_root = "reikiworld.biz",
-            service_discovery_namespace="dev.todo"
-        }
-        // ...
-    }
-}
+variable "project_name" { default = "todo-ecs" }
+
+variable "db_name"      { default = "todo" }
+variable "db_username"  { default = "t0d0" }
+variable "db_passwd"    { default = "passw0rd" }
+
+variable "domain_root"  { }
+
+variable "cidrs"        { }

@@ -1,33 +1,49 @@
 provider "aws" {
-    profile = data.terraform_remote_state.vpc.outputs.aws_profile
-    region  = data.terraform_remote_state.vpc.outputs.aws_region
+    profile   = var.aws_profile
+    region    = var.aws_region
 }
 
-data "terraform_remote_state" "vpc" {
-    backend = "local"
-    config = {
-        path = "../terraform/state/vpc/terraform.tfstate"
-    }
+module "default-vpc" {
+    source            = "../modules/default-vpc-data"
+    default-vpc-name  = "default-vpc"
 }
 
-data "terraform_remote_state" "db" {
-    backend = "local"
-    config = { 
-        path = "../terraform/state/db/terraform.tfstate"
-    }
+module "alb-dns" {
+    source        = "../modules/alb-dns-names"
+    project_name  = var.project_name
+    vpc_id        = module.default-vpc.default_vpc_id
+    vpc_subnets   = module.default-vpc.default_vpc_subnets
+    rootzone_name = var.domain_root
+    domain_names  = [ "todo.${var.domain_root}", "www.todo.${var.domain_root}" ]
 }
 
-locals {
-    env_name = data.terraform_remote_state.vpc.outputs.env_name
-    config   = var.configuration[data.terraform_remote_state.vpc.outputs.env_name]
-
-    // vpc_arn  = data.terraform_remote_state.vpc.outputs.vpc_arn
-    // vpc_id   = data.terraform_remote_state.vpc.outputs.vpc_id
+module "rds-instance" {
+    source      = "../modules/rds"
+    vpc_id      = module.default-vpc.default_vpc_id
+    // Use this to restrict access to the VPC network
+    // cidr        = module.default-vpc.default_vpc_cidrs
+    // Use this for permissive access by anyone
+    cidr = concat(module.default-vpc.default_vpc_cidrs, var.cidrs)
+    // Use this to make the database publicly accessible
+    publicly_accessible = true
+    db_name     = var.db_name
+    db_username = var.db_username
+    db_passwd   = var.db_passwd
 }
 
-/* 
-resource "aws_ecs_cluster" "main" {
-    name = "${data.terraform_remote_state.vpc.outputs.project_name}-ecs-cluster"
-    capacity_providers = [ "FARGATE" ]
+resource "local_file" "deploy" {
+    filename = "${path.module}/deploy.sh"
+    content = templatefile("./tmpl/deploy-tmpl.sh", {
+        alb_arn: module.alb-dns.alb_arn,
+        sequelize_connect_arn: aws_secretsmanager_secret.todo-access.arn
+    })
 }
-*/
+
+resource "local_file" "setsticky" {
+    filename = "${path.module}/setsticky.sh"
+    content = templatefile("./tmpl/setsticky-tmpl.sh", {
+        alb_arn: module.alb-dns.alb_arn
+    })
+}
+
+

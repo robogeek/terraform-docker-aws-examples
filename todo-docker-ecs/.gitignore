@@ -1,3 +1,4 @@
 deploy.sh
+setsticky.sh
 *.auto.tfvars
 .terraform*

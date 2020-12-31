@@ -1,82 +1,29 @@
 version: '3.8'
 
-# x-aws-cluster: ${ECS_CLUSTER_ARN}
-# x-aws-vpc: ${VPC_ARN}
-# x-aws-loadbalancer: ${ALB_ARN}
+x-aws-loadbalancer: ${ALB_ARN}
 
 services:
-
-    # REMOVED: cronginx, nginx-proxy-man, traefik
 
     todo:
         image: robogeek/todo-app:first-dockerize-redis
         # container_name: todo-app
-        ports: 
-           - "80:80"
-    #    networks:
-    #        # - dbnet
-    #        - webnet
-    #        - redisnet
+        ports:
+          - "80:80"
         deploy:
             replicas: 1
-        # removed labels
-        # removed depends_on:
-            # removed - db
-            # removed - redis
-    # removed    dns:
-    #        - 8.8.8.8
-    #        - 9.9.9.9
-    #    secrets:
-    #        - RDS_DB_CONFIG
+        secrets:
+            - sequelize_connect
         environment:
-            - SEQUELIZE_CONNECT=models/sequelize-mysql-docker.yaml
-            - SEQUELIZE_DBHOST=${SEQUELIZE_DBHOST}
-            - SEQUELIZE_DBNAME=${SEQUELIZE_DBNAME}
-            - SEQUELIZE_DBUSER=${SEQUELIZE_DBUSER}
-            - SEQUELIZE_DBPASSWD=${SEQUELIZE_DBPASSWD}
-            # removed - REDIS_ENDPOINT=redis.todo.local
-            # - REDIS_IOREDIS=yes
-            # removed - NODE_DEBUG=redis
-            # - REDIS_PASSWD=sider
+            - SEQUELIZE_CONNECT=/run/secrets/sequelize_connect
+            - REDIS_ENDPOINT=redis.todo-docker-ecs.local
+            # - NODE_DEBUG=redis
             # Enable this for debugging output ,socket.io:*
             - DEBUG=todos:*,ioredis:*,socket.io:*,engine
-        # removed command: [ "./wait-for-it.sh", "-t", "0", "db:3306", "--", "node", "./app.mjs" ]
  
-    # removed redis:
-    #    image: redis
-    #    # container_name: redis
-    #    hostname: redis
-    #    # , "--bind", "redis",
-    #    # command: ["redis-server", 
-    #    #                "--bind", "0.0.0.0", 
-    #    #                "--port", "6379", 
-    #    #                "--protected-mode", "yes",
-    #    #                "--requirepass", "sider",
-    #    #                "--loglevel", "debug" ]
-    #    # ports:
-    #    #     - "6379:6379"
-    #    deploy:
-    #        replicas: 1
-    #        placement:
-    #            constraints:
-    #                - "node.hostname==srv2"
-    #    networks:
-    #        - redisnet
-    #    # dns:
-    #    #    - 8.8.8.8
-    #    #    - 9.9.9.9
+    redis:
+        image: redis
 
-    # removed database
-
-#secrets:
-#    RDS_DB_CONFIG:
-#        external: true
-
-# networks:
-#    # dbnet:
-#    #     driver: overlay
-#    webnet:
-#        driver: overlay
-#    redisnet:
-#        driver: overlay
-
+secrets:
+  sequelize_connect:
+    external: true
+    name: ${SEQUELIZE_CONNECT_ARN}
