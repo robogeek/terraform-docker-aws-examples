@@ -23,7 +23,7 @@ module "rds-instance" {
     // Use this to restrict access to the VPC network
     // cidr        = module.default-vpc.default_vpc_cidrs
     // Use this for permissive access by anyone
-    cidr = [ "0.0.0.0/0" ]
+    cidr = concat(module.default-vpc.default_vpc_cidrs, [ "0.0.0.0/0" ])
     // Use this to make the database publicly accessible
     publicly_accessible = true
     db_name     = var.db_name
