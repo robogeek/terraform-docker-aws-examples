@@ -1,26 +1,34 @@
 resource "aws_instance" "srv" {
-    count = length(local.config)
+    count = length(var.instances)
 
     ami = var.ami_id
-    instance_type = local.config[count.index].instance_type
-    subnet_id = data.terraform_remote_state.vpc.outputs.public_subnets[
-        count.index % length(data.terraform_remote_state.vpc.outputs.public_subnets)
+    instance_type = var.instances[count.index].instance_type
+    subnet_id = local.subnet_ids[
+        count.index % length(local.subnet_ids)
     ]
     key_name = var.key_pair
     vpc_security_group_ids = [ aws_security_group.ec2-sg.id ]
-    associate_public_ip_address = local.config[count.index].associate_public_ip_address
+    associate_public_ip_address = var.instances[count.index].associate_public_ip_address
 
     tags = {
-        Name = local.config[count.index].name
+        Name = var.instances[count.index].name
     }
 
     user_data = join("\n", [
         file("docker_install.sh"),
-        "sudo hostname ${local.config[count.index].host_name}",
-        local.config[count.index].swarm_init
+        "sudo hostname ${var.instances[count.index].host_name}",
+        var.instances[count.index].swarm_init
             ? "docker swarm init" : ""
     ])
 
+}
+
+data "aws_subnet_ids" "vpc" {
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+}
+
+locals {
+    subnet_ids = tolist(data.aws_subnet_ids.vpc.ids)
 }
 
 resource "aws_security_group" "ec2-sg" {
