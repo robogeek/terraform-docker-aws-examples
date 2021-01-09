@@ -12,5 +12,3 @@ output "igw_arn"  { value = module.vpc-example.igw_arn }
 output "public_subnets" { value = module.vpc-example.public_subnets }
 
 output "azs"      { value = module.vpc-example.azs }
-
-output "env_name" { value = var.env_name }
