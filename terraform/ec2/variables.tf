@@ -14,6 +14,8 @@ variable "ami_id" {
 }
 
 variable "key_pair"       { type = string }
+variable "key_pair_file"  { }
+variable "ssh_user_id"    { default = "-l ubuntu" }
 
 variable "instances" {
     /* type = list(object({
@@ -31,7 +33,10 @@ variable "instances" {
             associate_public_ip_address = true,
             host_name = "srv1",
             ssh_connect = "srv1",
-            swarm_init = true
+            swarm_init = true,
+            create_directories = [ "/home/ubuntu/letsencrypt" ],
+            join_manager = false,
+            join_worker = false
         },
         {
             name = "ec2-srv2",
@@ -39,7 +44,10 @@ variable "instances" {
             associate_public_ip_address = true,
             host_name = "srv2",
             ssh_connect = "srv2",
-            swarm_init = false
+            swarm_init = false,
+            create_directories = [ ],
+            join_manager = true,
+            join_worker = false
         },
         {
             name = "ec2-srv3",
@@ -47,7 +55,10 @@ variable "instances" {
             associate_public_ip_address = true,
             host_name = "srv3",
             ssh_connect = "srv3",
-            swarm_init = false
+            swarm_init = false,
+            create_directories = [ ],
+            join_manager = true,
+            join_worker = false
         }
     ]
 }

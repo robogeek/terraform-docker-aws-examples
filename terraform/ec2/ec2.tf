@@ -14,21 +14,47 @@ resource "aws_instance" "srv" {
         Name = var.instances[count.index].name
     }
 
-    user_data = join("\n", [
-        file("docker_install.sh"),
-        "sudo hostname ${var.instances[count.index].host_name}",
-        var.instances[count.index].swarm_init
-            ? "docker swarm init" : ""
-    ])
+    user_data = templatefile("./tmpl/docker_install-tmpl.sh", {
+        host_name: var.instances[count.index].host_name,
+        create_directories: var.instances[count.index].create_directories,
+        swarm_init: var.instances[count.index].swarm_init
+    })
 
 }
 
 data "aws_subnet_ids" "vpc" {
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+    vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
 }
 
 locals {
     subnet_ids = tolist(data.aws_subnet_ids.vpc.ids)
+    host_modes = [ for instance in var.instances : {
+        host_name = instance.host_name
+        swarm_init = instance.swarm_init
+        join_manager = instance.join_manager
+        join_worker = instance.join_worker
+        ip_addr = local.host_ips[instance.name]
+    } ]
+    host_ips = { for ec2 in aws_instance.srv
+            : ec2.tags["Name"] => ec2.public_ip }
+}
+
+resource "local_file" "swarm-check" {
+    filename = "${path.module}/swarm-check.sh"
+    content = templatefile("./tmpl/swarm-check-tmpl.sh", {
+        key_pair_file: "-i ${var.key_pair_file}",
+        ssh_user_id: var.ssh_user_id,
+        servers: aws_instance.srv.*.public_ip
+    })
+}
+
+resource "local_file" "swarm-config" {
+    filename = "${path.module}/swarm-config.sh"
+    content = templatefile("./tmpl/swarm-config-tmpl.sh", {
+        key_pair_file: "-i ${var.key_pair_file}",
+        ssh_user_id: var.ssh_user_id,
+        host_modes: local.host_modes
+    })
 }
 
 resource "aws_security_group" "ec2-sg" {
