@@ -28,14 +28,14 @@ data "aws_subnet_ids" "vpc" {
 
 locals {
     subnet_ids = tolist(data.aws_subnet_ids.vpc.ids)
-    host_modes = [ for instance in var.instances : {
-        host_name = instance.host_name
-        swarm_init = instance.swarm_init
+    host_modes  = [ for instance in var.instances : {
+        host_name    = instance.host_name
+        swarm_init   = instance.swarm_init
         join_manager = instance.join_manager
-        join_worker = instance.join_worker
-        ip_addr = local.host_ips[instance.name]
+        join_worker  = instance.join_worker
+        ip_addr      = local.host_ips[instance.name]
     } ]
-    host_ips = { for ec2 in aws_instance.srv
+    host_ips   = { for ec2 in aws_instance.srv
             : ec2.tags["Name"] => ec2.public_ip }
 }
 
@@ -94,6 +94,14 @@ resource "aws_security_group" "ec2-sg" {
         from_port   = 443
         to_port     = 443
         cidr_blocks = [ "0.0.0.0/0" ]
+    }
+
+    ingress {
+        description = "MySQL"
+        protocol    = "TCP"
+        from_port   = 3306
+        to_port     = 3306
+        cidr_blocks = [ data.terraform_remote_state.vpc.outputs.vpc_cidr ]
     }
 
     ingress {
