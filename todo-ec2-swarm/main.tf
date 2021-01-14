@@ -30,7 +30,6 @@ locals {
 
     lb_domains = [
             var.todo_domain, "www.${var.todo_domain}",
-            var.dbadmin_domain, "www.${var.dbadmin_domain}",
             var.mgr_domain ]
 }
 
@@ -63,9 +62,7 @@ resource "local_file" "stack-deploy" {
     content = templatefile("./tmpl/deploy-tmpl.sh", {
         domain_mgr: var.mgr_domain,
         domain_todo: var.todo_domain,
-        domain_todo_www: "www.${var.todo_domain}"
-        domain_dbadmin: var.dbadmin_domain,
-        domain_dbadmin_www: "www.${var.dbadmin_domain}"
+        domain_todo_www: "www.${var.todo_domain}",
         email_lets_encrypt: var.email_lets_encrypt,
         stack_name: var.stack_name
     })
