@@ -21,7 +21,7 @@ module "alb-dns" {
     vpc_subnets   = module.default-vpc.default_vpc_subnets
     rootzone_name = var.domain_root
     domain_names  = [ "dbadmin.${var.domain_root}", "www.dbadmin.${var.domain_root}" ]
-    cidrs         = var.cidrs
+    cidrs         = concat(module.default-vpc.default_vpc_cidrs, var.cidrs)
 }
 
 resource "local_file" "deploy" {

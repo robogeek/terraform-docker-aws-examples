@@ -4,6 +4,6 @@ services:
         image: containous/whoami
         ports: 
             - "80:80"
-        # deploy:
-        #    replicas: 1
+        deploy:
+            replicas: 1
 
