@@ -161,7 +161,7 @@ services:
             # Enable this for debugging output ,socket.io:*
             - DEBUG=todos:*,ioredis:*,socket.io:*,engine
         # command: [ "./wait-for-it.sh", "-t", "0", "db:3306", "--", "node", "./app.mjs" ]
- 
+
     redis:
         image: redis
     #    # container_name: redis

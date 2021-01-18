@@ -17,7 +17,8 @@ data "terraform_remote_state" "vpc" {
 }
 
 locals {
-    env_name = data.terraform_remote_state.vpc.outputs.env_name
-    config = var.configuration[local.env_name]
+    srv-dns       = aws_instance.srv.*.public_dns
+    srv-addresses = aws_instance.srv.*.public_ip
+    srv-hostnm    = var.instances.*.host_name
+    srv-ssh       = var.instances.*.ssh_connect
 }
-

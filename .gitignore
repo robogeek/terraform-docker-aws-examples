@@ -2,6 +2,8 @@ out
 node_modules
 terraform-docker-ecs.epub
 .terraform
+.terraform.lock.hcl
+*.tfvars
 terraform.tfstate
 terraform.tfstate.backup
 terraform/state
