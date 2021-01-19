@@ -28,5 +28,6 @@ module "vpc-example" {
 
     azs             = data.aws_availability_zones.available.names
     public_subnets  = var.public_subnet_cidrs
+    private_subnets = var.private_subnet_cidrs
 
 }
