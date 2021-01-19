@@ -1,6 +1,6 @@
 provider "aws" {
-    profile = data.terraform_remote_state.vpc.outputs.aws_profile
-    region  = data.terraform_remote_state.vpc.outputs.aws_region
+    profile = local.vpc-outputs.aws_profile
+    region  = local.vpc-outputs.aws_region
 }
 
 terraform {
@@ -23,12 +23,12 @@ data "terraform_remote_state" "db" {
     }
 }
 
-resource "aws_ecs_cluster" "main" {
-    name = "${data.terraform_remote_state.vpc.outputs.project_name}-ecs-cluster"
-    capacity_providers = [ "FARGATE" ]
+locals {
+    vpc-outputs = data.terraform_remote_state.vpc.outputs
+    db-outputs  = data.terraform_remote_state.db.outputs
 }
 
-locals {
-    env_name = data.terraform_remote_state.vpc.outputs.env_name
-    config = var.configuration[data.terraform_remote_state.vpc.outputs.env_name]
+resource "aws_ecs_cluster" "main" {
+    name = "${local.vpc-outputs.project_name}-ecs-cluster"
+    capacity_providers = [ "FARGATE" ]
 }

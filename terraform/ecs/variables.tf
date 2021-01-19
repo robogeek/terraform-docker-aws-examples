@@ -3,7 +3,6 @@ variable "todo_image" {
     default = "robogeek/todo-app:first-dockerize-redis"
 }
 
-
 variable "todo_fargate_cpu"    { default = 256 }
 variable "todo_fargate_memory" { default = 512 }
 variable "todo_count"          { default = 1 }
@@ -18,14 +17,5 @@ variable "ecs_task_execution_role_name" {
     default = "myEcsTaskExecutionRole"
 }
 
-variable "configuration" {
-    type = map(object({
-        domain_root=string
-    }))
-    default = {
-        "DEV" = {
-            domain_root = "reikiworld.biz"
-        }
-        // ...
-    }
-}
+variable "domain_root" { }
+variable "bare_domain" { }

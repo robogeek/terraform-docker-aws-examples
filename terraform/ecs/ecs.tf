@@ -1,6 +1,6 @@
 
 resource "aws_ecs_task_definition" "todo" {
-    family                   = "${data.terraform_remote_state.vpc.outputs.project_name}-todo-task"
+    family                   = "${local.vpc-outputs.project_name}-todo-task"
     execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
     network_mode             = "awsvpc"
     requires_compatibilities = ["FARGATE"]
@@ -24,8 +24,8 @@ resource "aws_ecs_task_definition" "todo" {
             logConfiguration = {
                 logDriver = "awslogs"
                 options = {
-                    awslogs-group = "/ecs/${data.terraform_remote_state.vpc.outputs.project_name}-todo"
-                    awslogs-region = data.terraform_remote_state.vpc.outputs.aws_region
+                    awslogs-group = "/ecs/${local.vpc-outputs.project_name}-todo"
+                    awslogs-region = local.vpc-outputs.aws_region
                     awslogs-stream-prefix = "ecs"
                 }
             }
@@ -41,16 +41,16 @@ resource "aws_ecs_task_definition" "todo" {
                     value = "models/sequelize-mysql-docker.yaml"
                 }, {
                     name = "SEQUELIZE_DBNAME"
-                    value = data.terraform_remote_state.db.outputs.tododb_name
+                    value = local.db-outputs.tododb_name
                 }, {
                     name = "SEQUELIZE_DBUSER"
-                    value = data.terraform_remote_state.db.outputs.tododb_username
+                    value = local.db-outputs.tododb_username
                 }, {
                     name = "SEQUELIZE_DBPASSWD"
-                    value = data.terraform_remote_state.db.outputs.tododb_userpasswd
+                    value = local.db-outputs.tododb_userpasswd
                 }, {
                     name = "SEQUELIZE_DBHOST"
-                    value = data.terraform_remote_state.db.outputs.tododb-address
+                    value = local.db-outputs.tododb-address
                 } /* {
                     name = "NODE_DEBUG"
                     value = "redis"
@@ -69,8 +69,8 @@ resource "aws_ecs_task_definition" "todo" {
             logConfiguration = {
                 logDriver = "awslogs"
                 options = {
-                    awslogs-group = "/ecs/${data.terraform_remote_state.vpc.outputs.project_name}-redis"
-                    awslogs-region = data.terraform_remote_state.vpc.outputs.aws_region
+                    awslogs-group = "/ecs/${local.vpc-outputs.project_name}-redis"
+                    awslogs-region = local.vpc-outputs.aws_region
                     awslogs-stream-prefix = "ecs"
                 }
             }
@@ -83,7 +83,7 @@ resource "aws_ecs_task_definition" "todo" {
 }
 
 resource "aws_ecs_service" "todo" {
-    name            = "${data.terraform_remote_state.vpc.outputs.project_name}-todo-service"
+    name            = "${local.vpc-outputs.project_name}-todo-service"
     cluster         = aws_ecs_cluster.main.id
     task_definition = aws_ecs_task_definition.todo.arn
     desired_count   = var.todo_count
@@ -91,7 +91,7 @@ resource "aws_ecs_service" "todo" {
 
     network_configuration {
         security_groups  = [ aws_security_group.todo_task.id ]
-        subnets          = data.terraform_remote_state.vpc.outputs.private_subnets
+        subnets          = local.vpc-outputs.private_subnets
         assign_public_ip = false
     }
 
@@ -107,14 +107,14 @@ resource "aws_ecs_service" "todo" {
 }
 
 resource "aws_security_group" "todo_task" {
-    name        = "${data.terraform_remote_state.vpc.outputs.project_name}-todo-task-security-group"
-    vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id 
+    name        = "${local.vpc-outputs.project_name}-todo-task-security-group"
+    vpc_id      = local.vpc-outputs.vpc_id 
 
     ingress {
         protocol        = "tcp"
         from_port       = 0
         to_port         = "80"
-        cidr_blocks     = [ data.terraform_remote_state.vpc.outputs.vpc_cidr ]
+        cidr_blocks     = [ local.vpc-outputs.vpc_cidr ]
     }
 
     egress {
@@ -126,6 +126,6 @@ resource "aws_security_group" "todo_task" {
 }
 
 resource "aws_cloudwatch_log_group" "todo_log_group" {
-    name              = "/ecs/${data.terraform_remote_state.vpc.outputs.project_name}-todo"
+    name              = "/ecs/${local.vpc-outputs.project_name}-todo"
     retention_in_days = 30
 }

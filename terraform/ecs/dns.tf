@@ -1,13 +1,12 @@
 
 data "aws_route53_zone" "rootzone" {
-    name         = "${local.config.domain_root}."
+    name         = "${var.domain_root}."
     private_zone = false
 }
 
 locals {
-    bare_domain  = local.config.domain_root
-    www_domain   = "www.${local.config.domain_root}"
-    domain_names = [ "${local.bare_domain}.", "${local.www_domain}." ]
+    www_domain   = "www.${var.bare_domain}"
+    domain_names = [ "${var.bare_domain}.", "${local.www_domain}." ]
 }
 
 resource "aws_route53_record" "todo" {

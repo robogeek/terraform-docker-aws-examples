@@ -3,7 +3,7 @@ module "acm" {
     source  = "terraform-aws-modules/acm/aws"
     version = "~> 2.0"
 
-    domain_name = local.bare_domain
+    domain_name = var.bare_domain
     zone_id     = data.aws_route53_zone.rootzone.zone_id
 
     subject_alternative_names = [ local.www_domain ]
@@ -13,12 +13,12 @@ module "alb" {
     source  = "terraform-aws-modules/alb/aws"
     version = "~> 5.0"
 
-    name = "${data.terraform_remote_state.vpc.outputs.project_name}-load-balancer"
+    name = "${local.vpc-outputs.project_name}-load-balancer"
 
     load_balancer_type = "application"
 
-    vpc_id             = data.terraform_remote_state.vpc.outputs.vpc_id
-    subnets            = data.terraform_remote_state.vpc.outputs.public_subnets
+    vpc_id             = local.vpc-outputs.vpc_id
+    subnets            = local.vpc-outputs.public_subnets
     security_groups    = [ aws_security_group.lb.id ]
 
     # Use HTTP for communication with the back-end container
@@ -73,7 +73,7 @@ module "alb" {
             } ]
 
             conditions = [ {
-                host_headers = [ local.bare_domain ]
+                host_headers = [ var.bare_domain ]
             } ]
         },
         # For traffic arriving on the WWW domain,
@@ -84,7 +84,7 @@ module "alb" {
             actions = [ {
                 type        = "redirect"
                 status_code = "HTTP_301"
-                host        = local.bare_domain
+                host        = var.bare_domain
                 protocol    = "HTTPS"
             } ]
 
@@ -96,9 +96,9 @@ module "alb" {
 }
 
 resource "aws_security_group" "lb" {
-    name        = "${data.terraform_remote_state.vpc.outputs.project_name}-lb-security-group"
+    name        = "${local.vpc-outputs.project_name}-lb-security-group"
     description = "controls access to the ALB"
-    vpc_id      = data.terraform_remote_state.vpc.outputs.vpc_id 
+    vpc_id      = local.vpc-outputs.vpc_id 
 
     ingress {
         protocol    = "tcp"
