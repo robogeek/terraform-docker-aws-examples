@@ -35,7 +35,12 @@ resource "aws_ecs_task_definition" "todo" {
             } ]
             environment = [ /* {
                     name = "REDIS_ENDPOINT"
-                    value = "redis"
+                    // Uncomment this for a local REDIS instance
+                    // value = "redis"
+                    // Uncomment this for the REDIS Service in ecs-redis.tf
+                    value = local.redis_fqdn
+                    // Uncomment this for ElastiCache-based REDIS
+                    // name = aws_elasticache_cluster.example.cache_nodes[0].address
                 }, */ {
                     name = "SEQUELIZE_CONNECT"
                     value = "models/sequelize-mysql-docker.yaml"
@@ -51,13 +56,13 @@ resource "aws_ecs_task_definition" "todo" {
                 }, {
                     name = "SEQUELIZE_DBHOST"
                     value = local.db-outputs.tododb-address
-                } /* {
+                }, {
                     name = "NODE_DEBUG"
                     value = "redis"
                 }, {
                     name = "DEBUG"
                     value = "todos:*,ioredis:*,socket.io:*,engine"
-                }, */
+                }
             ]
         },
         /* {
@@ -87,6 +92,8 @@ resource "aws_ecs_service" "todo" {
     cluster         = aws_ecs_cluster.main.id
     task_definition = aws_ecs_task_definition.todo.arn
     desired_count   = var.todo_count
+    deployment_maximum_percent = var.todo_maximum_percent
+    deployment_minimum_healthy_percent = var.todo_minimum_healthy
     launch_type     = "FARGATE"
 
     network_configuration {

@@ -27,6 +27,13 @@ module "alb" {
         backend_protocol = "HTTP"
         backend_port     = 80
         target_type      = "ip"
+
+        // Uncomment to implement sticky sessions
+        //
+        // stickiness = {
+        //     enabled = true
+        //     type = "lb_cookie"
+        // }
     } ]
 
     # For any HTTP inbound traffic, redirect to HTTPS
