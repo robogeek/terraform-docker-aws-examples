@@ -23,6 +23,16 @@ services:
       - kanboard_plugins:/var/www/app/plugins
       - kanboard_ssl:/etc/nginx/ssl
 
+# Uncomment to patch the Cloud Formation stack
+#
+# x-aws-cloudformation:
+#  Resources:
+#    KanboardTCP80TargetGroup:
+#      Properties:
+#        HealthCheckPath: /login
+#        Matcher: 
+#          HttpCode: 200-499
+
 volumes:
   kanboard_data:
   kanboard_plugins:
