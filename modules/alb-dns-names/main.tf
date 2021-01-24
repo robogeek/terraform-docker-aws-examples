@@ -71,3 +71,5 @@ resource "aws_route53_record" "wordpress" {
 output "alb_dns"      { value = module.alb.this_lb_dns_name }
 output "alb_arn"      { value = module.alb.this_lb_arn }
 output "alb_id"       { value = module.alb.this_lb_id }
+
+output "rootzone_id"  { value = data.aws_route53_zone.rootzone.zone_id }
