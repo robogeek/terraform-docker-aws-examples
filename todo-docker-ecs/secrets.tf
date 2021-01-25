@@ -1,6 +1,3 @@
-variable "secret-name" {
-    default = "todo-access"
-}
 
 resource "aws_secretsmanager_secret" "todo-access" {
     name = var.secret-name

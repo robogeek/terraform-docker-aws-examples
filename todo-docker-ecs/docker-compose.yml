@@ -9,21 +9,109 @@ services:
         # container_name: todo-app
         ports:
           - "80:80"
+          - "443:443"
         deploy:
             replicas: 1
+        # Uncomment to use Secrets
         secrets:
             - sequelize_connect
         environment:
+            # - SEQUELIZE_CONNECT=models/sequelize-sqlite.yaml
+            # Uncomment to use DB config from Secrets
             - SEQUELIZE_CONNECT=/run/secrets/sequelize_connect
+            # Uncomment to implement REDIS
             - REDIS_ENDPOINT=redis.todo-docker-ecs.local
             # - NODE_DEBUG=redis
             # Enable this for debugging output ,socket.io:*
             - DEBUG=todos:*,ioredis:*,socket.io:*,engine
  
+    # Uncomment to implement REDIS
     redis:
         image: redis
 
+# Uncomment to use Secrets
 secrets:
   sequelize_connect:
     external: true
     name: ${SEQUELIZE_CONNECT_ARN}
+
+x-aws-cloudformation:
+  Resources:
+    TodoTCP80Listener:
+      Properties:
+        # Implement the redirect to HTTPS
+        # Note that this will eliminate the natural reference to TodoTCP80TargetGroup
+        DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Port: 443
+            Protocol: HTTPS
+            StatusCode: HTTP_301
+    TodoTCP80TargetGroup:
+      Properties:
+        # Implement stickiness
+        TargetGroupAttributes:
+          - Key: stickiness.enabled
+            Value: true
+          - Key: stickiness.type
+            Value: lb_cookie
+    TodoTCP443Listener:
+      Properties:
+        # Set protocol and associate with the SSL certificate
+        Protocol: "HTTPS"
+        Certificates:
+          - ${SSL_CERTIFICATE_ARN}
+        # Replace reference to TodoTCP443TargetGroup with this Fixed Response
+        DefaultActions:
+          - Type: "fixed-response"
+            FixedResponseConfig:
+              ContentType: "text/plain"
+              MessageBody: "BAD DOMAIN NAME"
+              StatusCode: "200"
+    # Delete port 443 target group
+    TodoTCP443TargetGroup:
+    # Match www.DOMAIN and redirect to DOMAIN
+    TodoTCP443WWWRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        ListenerArn:
+          Ref: TodoTCP443Listener
+        Priority: 50000
+        Conditions:
+          - Field: host-header
+            HostHeaderConfig:
+              Values:
+                - ${WWWDOMAIN}
+        Actions:
+          - Type: redirect
+            RedirectConfig:
+              Host: ${BASEDOMAIN}
+              Port: 443
+              Protocol: HTTPS
+              StatusCode: HTTP_301
+    # Match DOMAIN and forward to the port 80 Target Group
+    TodoTCP443BaseRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        ListenerArn:
+          Ref: TodoTCP443Listener
+        Priority: 40000
+        Conditions:
+          - Field: host-header
+            HostHeaderConfig:
+              Values:
+                - ${BASEDOMAIN}
+        Actions:
+          - Type: forward
+            ForwardConfig:
+              TargetGroups:
+                - TargetGroupArn:
+                    Ref: TodoTCP80TargetGroup
+    TodoService:
+      Properties:
+        # Eliminate the reference to TodoTCP443TargetGroup
+        LoadBalancers:
+        - ContainerName: todo
+          ContainerPort: 80
+          TargetGroupArn:
+            Ref: TodoTCP80TargetGroup
