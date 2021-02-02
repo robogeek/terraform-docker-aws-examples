@@ -53,7 +53,7 @@ data "aws_route53_zone" "rootzone" {
     private_zone = false
 }
 
-resource "aws_route53_record" "wordpress" {
+resource "aws_route53_record" "records" {
     count   = length(var.domain_names)
     zone_id = data.aws_route53_zone.rootzone.zone_id
     name    = "${var.domain_names[count.index]}."
@@ -73,3 +73,5 @@ output "alb_arn"      { value = module.alb.this_lb_arn }
 output "alb_id"       { value = module.alb.this_lb_id }
 
 output "rootzone_id"  { value = data.aws_route53_zone.rootzone.zone_id }
+
+output "dns_records"  { value = aws_route53_record.records }
