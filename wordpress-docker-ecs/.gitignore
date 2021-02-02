@@ -1,3 +1,7 @@
+convert.sh
 deploy.sh
+efs-mount.sh
+docker-compose.yml
 *.auto.tfvars
 .terraform*
+cf-*.yml
