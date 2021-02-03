@@ -13,6 +13,10 @@ data "aws_vpcs" "default-vpc" {
     }
 }
 
+data "aws_vpc" "default-vpc" {
+    id = local.default-vpc-id
+}
+
 data "aws_subnet_ids" "default-vpc" {
     vpc_id = local.default-vpc-id
 }
@@ -35,3 +39,4 @@ locals {
 output "default_vpc_id"      { value = local.default-vpc-id }
 output "default_vpc_subnets" { value = local.default-vpc-subnets }
 output "default_vpc_cidrs"   { value = local.default-vpc-cidrs }
+output "default_vpc_cidr"    { value = data.aws_vpc.default-vpc.cidr_block }
