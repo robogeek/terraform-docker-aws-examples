@@ -1,7 +1,8 @@
 docker compose up \
     --environment WP_EFS_ID=${ wp_id } \
     --environment ALB_ARN=${ alb_arn } \
-    --environment DB_ACCESS_ARN=${ secret_db_access_arn }
+    --environment DB_ACCESS_ARN=${ secret_db_access_arn } \
+    --environment OVERLAY=${ overlay }
 
 # Only needed if we use the corresponding variables in docker-compose.yml
 #
