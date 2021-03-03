@@ -1,6 +1,8 @@
 # terraform-docker-aws-examples
 Examples for using Terraform to deploy to AWS using Docker
 
+This repository is a companion to the book [Deploying Docker Containers to AWS using Terraform](https://www.amazon.com/Deploying-Docker-Containers-using-Terraform-ebook/dp/B08WG578L1/)
+
 This is the MAIN branch which contains no code.  Everything of interest is in the following branches:
 
 * [VPC](https://github.com/robogeek/terraform-docker-aws-examples/tree/vpc) - Demonstrates setting up a simple VPC on AWS
